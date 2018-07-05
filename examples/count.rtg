@@ -1,0 +1,30 @@
+// While loop
+
+loop = While[{
+	a = Unequal[$x];
+	a[10];
+}];
+
+loop = loop[{
+	b = Add[$x];
+	x = b[1];
+	Print[$x];
+}];
+
+x = 1;
+Do[$loop];
+
+// Do...While loop
+
+loop = DoWhile[{
+	Boolean[$x];
+}];
+
+loop = loop[{
+	Print[$x];
+	b = Add[$x];
+	x = b[1];
+}];
+
+x = 0;
+Do[$loop];
