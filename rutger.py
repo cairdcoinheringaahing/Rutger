@@ -512,6 +512,28 @@ def dowhile(condition):
         return innerdo
     return wrappers(exe, 'DoWhile[Block]<Block -> Do>')
 
+def ifstatement(condition):
+    def exe(code):
+        def innerdo(line, ln):
+            if evaluate(condition, line, ln)[-1]:
+                evaluate(code, line, ln)
+
+        return innerdo
+    return wrappers(exe, 'If[Block]<Block -> Do>')
+
+def ifelse(condition):
+    def if_arg(if_branch):
+        def exe(else_branch):
+            def innerdo(line, ln):
+                if evaluate(condition, line, ln)[-1]:
+                    evaluate(if_branch, line, ln)
+                else:
+                    evaluate(else_branch, line, ln)
+                    
+            return innerdo
+        return wrappers(exe, 'IfElse[Block][Block]<Block -> Do>')
+    return wrappers(if_arg, 'IfElse[Block]<Block -> Block -> Do>')
+
 class function:
     def __init__(self, sig):
         args = sig_parse(sig)
@@ -773,6 +795,16 @@ builtins = {
     'DoWhile': wrappers(
         dowhile,
         'DoWhile<Block -> Block -> Do>',
+    ),
+
+    'If': wrappers(
+        ifstatement,
+        'If<Block -> Block -> Do>',
+    ),
+
+    'IfElse': wrappers(
+        ifelse,
+        'IfElse<Block -> Block -> Block -> Do>',
     ),
 
     # Other
