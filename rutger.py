@@ -600,7 +600,7 @@ types = {
     'Signature' : lambda v: v != sig_parse(v),
     'Var'       : lambda v: v[0] == '@' and re.search(r'[A-Za-z][a-z]*', v[1:]),
     'Boolean'   : (bool,),
-    'Iterable'  : lambda v: hasattr(x, '__iter__'),
+    'Iterable'  : lambda v: hasattr(v, '__iter__'),
 
 }
 
