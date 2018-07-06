@@ -683,6 +683,14 @@ builtins = {
         lambda array: array[:-1],
         'Pop<Array -> Array>',
     ),
+    
+    'Concat': wrappers(
+        lambda x: wrappers(
+            lambda y: x + y,
+            'Concat[Iterable]<Iterable -> Iterable>',
+        ),
+        'Concat<Iterable -> Iterable -> Iterable>',
+    ),
 
     # Real ->
     
