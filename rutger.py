@@ -595,15 +595,15 @@ types = {
     'Real'      : (int, float),
     'Complex'   : (complex),
     'Str'       : (str,),
-    'String'    : lambda a: all(type(i)==str for i in a),
+    'String'    : lambda v: all(type(i) == str for i in v),
     'Array'     : (list,),
     'Dictionary': (dict,),
     'Function'  : callable,
     'Block'     : (Block,),
-    'Any'       : lambda a: True,
+    'Any'       : lambda v: True,
     'Signature' : lambda v: v != sig_parse(v),
     'Var'       : lambda v: v[0] == '@' and re.search(r'[A-Za-z][a-z]*', v[1:]),
-    'Boolean'   : (bool,),
+    'Boolean'   : lambda v: v in [True, False] and not isinstance(v, int),
     'Iterable'  : lambda v: hasattr(v, '__iter__'),
 
 }
@@ -633,6 +633,11 @@ builtins = {
             'Unequal[Any]<Any -> Boolean>',
         ),
         'Unequal<Any -> Any -> Boolean>',
+    ),
+    
+    'Not': wrappers(
+        lambda x: not x,
+        'Not<Any -> Boolean>',
     ),
 
     # Function -> Array -> 
@@ -768,6 +773,111 @@ builtins = {
             'GreaterOrEqualTo[Real]<Real -> Boolean>',
         ),
         'GreaterOrEqualTo<Real -> Real -> Boolean>',
+    ),
+    
+    # Int ->
+    
+    'BitwiseAnd': wrappers(
+        lambda x: wrappers(
+            lambda y: x & y,
+            'BitwiseAnd[Int]<Int -> Int>',
+        ),
+        'BitwiseAnd<Int -> Int -> Int>',
+    ),
+    
+    'BitwiseOr': wrappers(
+        lambda x: wrappers(
+            lambda y: x | y,
+            'BitwiseOr[Int]<Int -> Int>',
+        ),
+        'BitwiseOr<Int -> Int -> Int>',
+    ),
+    
+    'BitwiseXor': wrappers(
+        lambda x: wrappers(
+            lambda y: x ^ y,
+            'BitwiseXor[Int]<Int -> Int>',
+        ),
+        'BitwiseXor<Int -> Int -> Int>',
+    ),
+    
+    'BitwiseNot': wrappers(
+        lambda x: ~x,
+        'BitwiseNot<Int -> Int>',
+    ),
+    
+    'BitwiseNand': wrappers(
+        lambda x: wrappers(
+            lambda y: ~(x & y),
+            'BitwiseNand[Int]<Int -> Int>',
+        ),
+        'BitwiseNand<Int -> Int -> Int>',
+    ),
+    
+    'BitwiseNor': wrappers(
+        lambda x: wrappers(
+            lambda y: ~(x | y),
+            'BitwiseNor[Int]<Int -> Int>',
+        ),
+        'BitwiseNor<Int -> Int -> Int>',
+    ),
+    
+    'BitwiseXnor': wrappers(
+        lambda x: wrappers(
+            lambda y: ~(x ^ y),
+            'BitwiseXnor[Int]<Int -> Int>',
+        ),
+        'BitwiseXnor<Int -> Int -> Int>',
+    ),
+    
+    # Boolean ->
+    
+    'And': wrappers(
+        lambda x: wrappers(
+            lambda y: x and y,
+            'And[Boolean]<Boolean -> Boolean>',
+        ),
+        'And<Boolean -> Boolean -> Boolean>',
+    ),
+    
+    'Or': wrappers(
+        lambda x: wrappers(
+            lambda y: x or y,
+            'Or[Boolean]<Boolean -> Boolean>',
+        ),
+        'Or<Boolean -> Boolean -> Boolean>',
+    ),
+    
+    'Xor': wrappers(
+        lambda x: wrappers(
+            lambda y: x != y,
+            'Xor[Boolean]<Boolean -> Boolean>',
+        ),
+        'Xor<Boolean -> Boolean -> Boolean>',
+    ),
+    
+    'Nand': wrappers(
+        lambda x: wrappers(
+            lambda y: not(x and y),
+            'Nand[Boolean]<Boolean -> Boolean>',
+        ),
+        'Nand<Boolean -> Boolean -> Boolean>',
+    ),
+    
+    'Nor': wrappers(
+        lambda x: wrappers(
+            lambda y: not(x or y),
+            'Nor[Boolean]<Boolean -> Boolean>',
+        ),
+        'Nor<Boolean -> Boolean -> Boolean>',
+    ),
+    
+    'Xnor': wrappers(
+        lambda x: wrappers(
+            lambda y: x == y,
+            'Xnor[Boolean]<Boolean -> Boolean>',
+        ),
+        'Xnor<Boolean -> Boolean -> Boolean>',
     ),
 
     # Str ->
