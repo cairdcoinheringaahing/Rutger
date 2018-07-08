@@ -352,7 +352,9 @@ def execute(code):
         if isinstance(ins, Operator):
             returns.append(call(ins, line, ln))
         if isinstance(ins, Assignment):
-            variables[ins.var] = fromassign(ins.val, line, ln)
+            ret = fromassign(ins.val, line, ln)
+            variables[ins.var] = ret
+            returns.append(ret)
 
 def evaluate(block, line, num):
     returns = []
@@ -360,7 +362,9 @@ def evaluate(block, line, num):
         if isinstance(chunk, Operator):
             returns.append(call(chunk, line, num))
         if isinstance(chunk, Assignment):
-            variables[chunk.var] = fromassign(chunk.val, line, num)
+            ret = fromassign(chunk.val, line, num)
+            variables[chunk.var] = ret
+            returns.append(ret)
     return returns
 
 def to_arg(arg, line, ln):
