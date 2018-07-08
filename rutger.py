@@ -261,7 +261,7 @@ def parse(string):
     string = list(map(lambda a: a.split('//')[0], string.split('\n')))
 
     for index, segment in enumerate(segments):
-        if string[index] and string[index].strip()[-1] not in ';{[':
+        if string[index].strip() and string[index].strip()[-1] not in ';{[':
             raise Error('Syntax', string[index], index, 'Missing semicolon')
    
         yield (index, reduce(segment))
