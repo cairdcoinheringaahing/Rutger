@@ -29,6 +29,19 @@ class Assignment:
     def __repr__(self):
         return 'Assignment({} = {})'.format(self.var, self.val)
 
+class Swap:
+    def __init__(self, lhv, rhv):
+        self.lhv = lhv
+        self.rhv = rhv
+        self.zip = list(zip(lhv, rhv))
+
+    def __repr__(self):
+        string = 'Swap('
+        assigns = []
+        for l, r in self.zip:
+            assigns.append('{} = {}'.format(l, r))
+        return string + ', '.join(assigns) + ')'
+
 class Block:
     def __init__(self, *code):
         self.code = code
@@ -199,7 +212,7 @@ def parse(string):
     segments = statements(tkns)
 
     def reduce(array):
-        original = ''.join(array.copy())
+        original = ''.join(array.copy()) + ';'
         array = list(filter(lambda a: a != ' ', array))
 
         if len(array) == 1:
@@ -207,8 +220,7 @@ def parse(string):
             if array[0] == '(' and array[-1] == ')':
                 return to_array(array)
             else:
-                try: return eval(array)
-                except: return array
+                return array
         
         elif array[1] == '=':
             var = array.pop(0)
@@ -218,6 +230,19 @@ def parse(string):
             array.pop(0)
             base.val = reduce(array)
             return base
+
+        elif '=' in array and ',' in array:
+            lhs, rhs = ''.join(array).split('=')
+            lhs = lhs.split(',')
+            rhs = rhs.split(',')
+            return Swap(lhs, rhs)
+
+        elif '=' in array:
+            func = array.pop(0)
+            array.pop(0); array.pop()
+            var = array.pop(0)
+            val = reduce(array[1:])
+            return Operator(func, Assignment(var, val))
 
         elif '{' in array and '}' in array:
             func, _, _, *code, _, _ = array
@@ -244,11 +269,14 @@ def parse(string):
                     array.remove(tkn)
                 
             array = list(filter(lambda a: a not in '[]', array))
+
+            if ',' in array:
+                array = [list(filter(lambda a: a != ',', array))]
             
-            if len(array) > 1:
+            elif len(array) > 1:
                 raise Error('Syntax', original, index + 1, 'Curried functions must be declared before currying')
 
-            if len(array) == 0:
+            elif len(array) == 0:
                 raise Error('Syntax', original, index + 1, 'Non function variables must be prefixed with a \'$\' in arguments')
 
             base = opers.pop()
@@ -293,9 +321,13 @@ def getvar(name):
         pass
     
     if name == '$Input':
-        ret = input()
-        try: return eval(ret)
-        except: return ret
+        try:
+            ret = input()
+            return eval(ret)
+        except EOFError:
+            raise Msg('EndOfInput', 'No more input may be taken')
+        except:
+            return ret
     elif name == '$Argv':
         return next(ARGV)
     
@@ -303,6 +335,8 @@ def getvar(name):
         return variables[name[1:]]
     elif name[1:] in builtins:
         return builtins[name[1:]]
+    else:
+        raise Msg('UnknownVariable', 'Unknown variable: ${}'.format(name[1:]))
         
 def call(func, code, line):
     func, arg = func
@@ -311,10 +345,42 @@ def call(func, code, line):
     except:
         pass
 
-    if isinstance(arg, str) and arg[0] == '$':
-        arg = getvar(arg)
-        if callable(arg) and func == 'Print':
-            arg = arg.sig
+    started = arg
+
+    if isinstance(arg, str):
+        if arg[0] == '$':
+            arg = getvar(arg)
+            if callable(arg) and func == 'Print':
+                arg = arg.sig
+        
+        elif arg[0] == '(' and arg[-1] == ')':
+            arg = to_array(arg)
+    
+    if isinstance(arg, Assignment):
+        ret = fromassign(arg.val, code, line)
+        variables[arg.var] = ret
+        arg = ret
+
+    if isinstance(started, list):
+        if func in builtins:
+            conv = sig_parse(builtins[func].sig)[0]
+        elif func in variables:
+            conv = sig_parse(variables[func].sig)[0]
+        else:
+            raise Error('UnknownFunction', code, line, 'Unknown function: {}'.format(func))
+        
+        arg = list(map(getvar, arg))
+
+        if conv in ['Real', 'Int']:
+            arg = eval(''.join(map(str, arg)))
+        if conv == 'Str':
+            arg = ''.join(map(str, arg))
+        if conv == 'String':
+            arg = list(map(str, arg))
+        if conv == 'Boolean':
+            arg = list(map(bool, arg))
+        if conv == 'Any':
+            arg = '\n'.join(map(str, arg))
     
     if func in builtins.keys():
         func = builtins[func]
@@ -323,7 +389,7 @@ def call(func, code, line):
     if func in variables.keys():
         return variables[func](arg, code, line)
     
-    raise Error('Name', code, line, 'Unknown function: {}'.format(func))
+    raise Error('UnknownFunction', code, line, 'Unknown function: {}'.format(func))
 
 def fromassign(func, code, line):
     if isinstance(func, Operator):
@@ -333,28 +399,45 @@ def fromassign(func, code, line):
         ret = fromassign(func.val, code, line)
         variables[func.var] = ret
         return ret
+
+    if not isinstance(func, str):
+        return func
     
-    if isinstance(func, str) and func[0] == '$':
-        return getvar(func)
+    if func[0] == '$':
+        try:
+            return getvar(func)
+        except Msg as m:
+            raise Error(m.err, code, line, m.message)
 
     try:
         return eval(func)
     except:
-        return func
+        try:
+            return getvar('$' + func)
+        except:
+            raise Error('UnknownValue', code, line, 'Unknown value: {}'.format(func))
 
 def execute(code):
     code = code.strip()
     tree = list(parse(code))
+    print(*tree, sep = '\n')
 
     returns = []
     for ln, ins in tree:
         line = code.split('\n')[ln]
         if isinstance(ins, Operator):
             returns.append(call(ins, line, ln))
+            
         if isinstance(ins, Assignment):
             ret = fromassign(ins.val, line, ln)
             variables[ins.var] = ret
             returns.append(ret)
+
+        if isinstance(ins, Swap):
+            rets = list(map(lambda v: fromassign(v, line, ln), ins.rhv))
+            for var, val in zip(ins.lhv, rets):
+                variables[var] = val
+            returns.append(rets[-1])
 
 def evaluate(block, line, num):
     returns = []
