@@ -603,7 +603,7 @@ types = {
     'Any'       : lambda v: True,
     'Signature' : lambda v: v != sig_parse(v),
     'Var'       : lambda v: v[0] == '@' and re.search(r'[A-Za-z][a-z]*', v[1:]),
-    'Boolean'   : lambda v: v in [True, False] and not isinstance(v, int),
+    'Boolean'   : lambda v: v in [True, False],
     'Iterable'  : lambda v: hasattr(v, '__iter__'),
 
 }
