@@ -785,6 +785,16 @@ builtins = {
 
     # Real ->
     
+    'Increment': wrappers(
+        lambda x: x + 1,
+        'Increment<Real -> Real>',
+    ),
+    
+    'Decrement': wrappers(
+        lambda x: x - 1,
+        'Increment<Real -> Real>',
+    ),
+    
     'Add': wrappers(
         lambda x: wrappers(
             lambda y: x + y,
@@ -815,6 +825,14 @@ builtins = {
             'Divide[Real]<Real -> Real>',
         ),
         'Divide<Real -> Real -> Real>',
+    ),
+    
+    'Modulo': wrappers(
+        lambda x: wrappers(
+            lambda y: x % y,
+            'Modulo[Real]<Real -> Real>',
+        ),
+        'Modulo<Real -> Real -> Real>',
     ),
 
     'Pow': wrappers(
