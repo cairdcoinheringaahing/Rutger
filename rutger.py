@@ -795,6 +795,11 @@ builtins = {
         'Increment<Real -> Real>',
     ),
     
+    'IsPrime': wrappers(
+        lambda x: all(x%i for i in range(2, x)) and x > 2,
+        'IsPrime<Real -> Boolean>',
+    ),
+    
     'Add': wrappers(
         lambda x: wrappers(
             lambda y: x + y,
