@@ -420,7 +420,6 @@ def fromassign(func, code, line):
 def execute(code):
     code = code.strip()
     tree = list(parse(code))
-    print(*tree, sep = '\n')
 
     returns = []
     for ln, ins in tree:
