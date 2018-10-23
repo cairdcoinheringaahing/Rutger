@@ -221,6 +221,11 @@ def parse(string):
                 return to_array(array)
             else:
                 return array
+
+        elif '{' in array and '}' in array:
+            func, _, _, *code, _, _ = array
+            reduc = Block(*list(map(reduce, statements(code))))
+            return Operator(op = func, arg = reduc)
         
         elif array[1] == '=':
             var = array.pop(0)
@@ -243,11 +248,6 @@ def parse(string):
             var = array.pop(0)
             val = reduce(array[1:])
             return Operator(func, Assignment(var, val))
-
-        elif '{' in array and '}' in array:
-            func, _, _, *code, _, _ = array
-            reduc = Block(*list(map(reduce, statements(code))))
-            return Operator(op = func, arg = reduc)
 
         else:
             if 'Function' in array[1:]:
