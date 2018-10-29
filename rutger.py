@@ -62,15 +62,11 @@ class Error(Exception):
     def __init__(self, error_type, line, index, msg = None):
         if msg is not None:
             message = '''{}Error on line {}:
-
     {}
-
 {}'''.format(error_type, index, line, msg)
         else:
             message = '''{}Error on line {}:
-
     {}
-
 '''.format(error_type, index, line)
 
         super().__init__(message)
@@ -214,18 +210,13 @@ def parse(string):
     def reduce(array):
         original = ''.join(array.copy()) + ';'
         array = list(filter(lambda a: a != ' ', array))
-
+        
         if len(array) == 1:
             array = array[0]
             if array[0] == '(' and array[-1] == ')':
                 return to_array(array)
             else:
                 return array
-
-        elif '{' in array and '}' in array:
-            func, _, _, *code, _, _ = array
-            reduc = Block(*list(map(reduce, statements(code))))
-            return Operator(op = func, arg = reduc)
         
         elif array[1] == '=':
             var = array.pop(0)
@@ -235,6 +226,11 @@ def parse(string):
             array.pop(0)
             base.val = reduce(array)
             return base
+
+        elif '{' in array and '}' in array:
+            func, _, _, *code, _, _ = array
+            reduc = Block(*list(map(reduce, statements(code))))
+            return Operator(op = func, arg = reduc)
 
         elif '=' in array and ',' in array:
             lhs, rhs = ''.join(array).split('=')
@@ -328,8 +324,12 @@ def getvar(name):
             raise Msg('EndOfInput', 'No more input may be taken')
         except:
             return ret
+        
     elif name == '$Argv':
-        return next(ARGV)
+        try:
+            return next(ARGV)
+        except:
+            raise Msg('EndOfArgv', 'No more arguments exist')
     
     elif name[1:] in variables:
         return variables[name[1:]]
@@ -424,19 +424,22 @@ def execute(code):
     returns = []
     for ln, ins in tree:
         line = code.split('\n')[ln]
-        if isinstance(ins, Operator):
-            returns.append(call(ins, line, ln))
+        try:
+            if isinstance(ins, Operator):
+                returns.append(call(ins, line, ln))
             
-        if isinstance(ins, Assignment):
-            ret = fromassign(ins.val, line, ln)
-            variables[ins.var] = ret
-            returns.append(ret)
+            if isinstance(ins, Assignment):
+                ret = fromassign(ins.val, line, ln)
+                variables[ins.var] = ret
+                returns.append(ret)
 
-        if isinstance(ins, Swap):
-            rets = list(map(lambda v: fromassign(v, line, ln), ins.rhv))
-            for var, val in zip(ins.lhv, rets):
-                variables[var] = val
-            returns.append(rets[-1])
+            if isinstance(ins, Swap):
+                rets = list(map(lambda v: fromassign(v, line, ln), ins.rhv))
+                for var, val in zip(ins.lhv, rets):
+                    variables[var] = val
+                returns.append(rets[-1])
+        except Msg as m:
+            raise Error(m.err, line, ln, m.message)
 
 def evaluate(block, line, num):
     returns = []
@@ -544,6 +547,7 @@ def check_type(sig, val):
 ####
 
 def do(iterable_func, line, ln):
+    print(iterable_func, line, ln)
     if isinstance(iterable_func, Operator):
         iterable_func = call(iterable_func, line, ln) 
     if isinstance(iterable_func, str) and iterable_func[0] == '$':
@@ -557,6 +561,7 @@ def forloop(iters):
     def variable(var):
         var = var[1:]
         def exe(code):
+            print(code)
             def innerdo(line, ln):
                 for i in range(1, iters + 1):
                     variables[var] = i
