@@ -817,6 +817,11 @@ builtins = {
         ),
         'Repeat<Iterable -> Int -> Iterable>',
     ),
+    
+    'Wrap': wrappers(
+        lambda x: [x],
+        'Wrap<Any -> Iterable>',
+    ),
 
     # Real ->
     
