@@ -761,27 +761,27 @@ builtins = {
     
     'Reverse': wrappers(
         reverse,
-        'Reverse<Array -> Array>',
+        'Reverse<Iterable -> Array>',
     ),
 
     'Sort': wrappers(
         sorted,
-        'Sort<Array -> Array>',
+        'Sort<Iterable -> Array>',
     ),
     
     'Sum': wrappers(
         sum,
-        'Sum<Array -> Real>',
+        'Sum<Iterable -> Real>',
     ),
 
     'Deque': wrappers(
         lambda array: array[1:],
-        'Deque<Array -> Array>',
+        'Deque<Iterable -> Array>',
     ),
 
     'Pop': wrappers(
         lambda array: array[:-1],
-        'Pop<Array -> Array>',
+        'Pop<Iterable -> Array>',
     ),
     
     'Concat': wrappers(
@@ -827,6 +827,11 @@ builtins = {
     'Wrap': wrappers(
         lambda x: [x],
         'Wrap<Any -> Iterable>',
+    ),
+    
+    'Length': wrappers(
+        lambda x: len(x),
+        'Length<Iterable -> Int>',
     ),
 
     # Real ->
