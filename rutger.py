@@ -560,7 +560,6 @@ def forloop(iters):
     def variable(var):
         var = var[1:]
         def exe(code):
-            print(code)
             def innerdo(line, ln):
                 for i in range(1, iters + 1):
                     variables[var] = i
