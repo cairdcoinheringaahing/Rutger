@@ -703,6 +703,12 @@ builtins = {
         'Print<Any -> Str>',
         'id',
     ),
+    
+    'PrintEnd': wrappers(
+        lambda x: print(x, end = ''),
+        'PrintEnd<Any -> Str>',
+        'id',
+    ),
 
     'Equal': wrappers(
         lambda x: wrappers(
