@@ -456,7 +456,7 @@ def to_arg(arg, line, ln):
     if isinstance(arg, Operator):
         arg = call(arg, line, ln)
         
-    if isinstance(arg, str) and arg[0] == '$':
+    if isinstance(arg, str) and arg and arg[0] == '$':
         arg = getvar(arg)
     return arg
 
