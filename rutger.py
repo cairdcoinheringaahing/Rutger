@@ -915,6 +915,19 @@ builtins = {
         'GreaterOrEqualTo<Real -> Real -> Boolean>',
     ),
     
+    'Abs': wrappers(
+        abs,
+        'Abs<Real -> Real>',
+    ),
+    
+    'AbsDifference': wrappers(
+        lambda x: wrappers(
+            lambda y: abs(x - y),
+            'AbsDifference[Real]<Real -> Real>',
+        ),
+        'AbsDifference<Real -> Real -> Real>',
+    ),
+    
     # Int ->
     
     'IsPrime': wrappers(
