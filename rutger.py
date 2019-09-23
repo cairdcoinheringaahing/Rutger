@@ -845,7 +845,7 @@ builtins = {
 
     'Times': wrappers(
         lambda x: wrappers(
-            lambda y: to_arg(x) * to_arg(y),
+            lambda y: x * y,
             'Times[Real]<Real -> Real>',
         ),
         'Times<Real -> Real -> Real>',
