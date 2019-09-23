@@ -547,7 +547,6 @@ def check_type(sig, val):
 ####
 
 def do(iterable_func, line, ln):
-    print(iterable_func, line, ln)
     if isinstance(iterable_func, Operator):
         iterable_func = call(iterable_func, line, ln) 
     if isinstance(iterable_func, str) and iterable_func[0] == '$':
