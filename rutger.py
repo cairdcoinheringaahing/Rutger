@@ -800,7 +800,7 @@ builtins = {
     ),
     
     'IsPrime': wrappers(
-        lambda x: all(x%i for i in range(2, x)) and x > 2,
+        lambda x: all(x%i for i in range(2, x)) and x > 1,
         'IsPrime<Real -> Boolean>',
     ),
     
