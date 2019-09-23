@@ -785,6 +785,38 @@ builtins = {
         ),
         'Concat<Iterable -> Iterable -> Iterable>',
     ),
+    
+    'Append': wrappers(
+        lambda x: wrappers(
+            lambda y: x + [y],
+            'Append[Iterable]<Any -> Iterable>',
+        ),
+        'Append<Iterable -> Any -> Iterable>',
+    ),
+    
+    'Prepend': wrappers(
+        lambda x: wrappers(
+            lambda y: [y] + x,
+            'Prepend[Iterable]<Any -> Iterable>',
+        ),
+        'Prepend<Iterable -> Any -> Iterable>',
+    ),
+    
+    'GetIndex': wrappers(
+        lambda x: wrappers(
+            lambda y: x[y],
+            'GetIndex[Iterable]<Int -> Any>',
+        ),
+        'GetIndex<Iterable -> Int -> Any>',
+    ),
+    
+    'Repeat': wrappers(
+        lambda x: wrappers(
+            lambda y: x * y,
+            'Repeat[Iterable]<Int -> Iterable>',
+        ),
+        'Repeat<Iterable -> Int -> Iterable>',
+    ),
 
     # Real ->
     
@@ -796,11 +828,6 @@ builtins = {
     'Decrement': wrappers(
         lambda x: x - 1,
         'Increment<Real -> Real>',
-    ),
-    
-    'IsPrime': wrappers(
-        lambda x: all(x%i for i in range(2, x)) and x > 1,
-        'IsPrime<Real -> Boolean>',
     ),
     
     'Add': wrappers(
@@ -884,6 +911,11 @@ builtins = {
     ),
     
     # Int ->
+    
+    'IsPrime': wrappers(
+        lambda x: all(x%i for i in range(2, x)) and x > 1,
+        'IsPrime<Int -> Boolean>',
+    ),
     
     'BitwiseAnd': wrappers(
         lambda x: wrappers(
