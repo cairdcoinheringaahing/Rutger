@@ -757,7 +757,7 @@ builtins = {
         'Reduce<Function -> Array -> Real>',
     ),
 
-    # Array ->
+    # Iterable ->
     
     'Reverse': wrappers(
         reverse,
@@ -832,6 +832,14 @@ builtins = {
     'Length': wrappers(
         lambda x: len(x),
         'Length<Iterable -> Int>',
+    ),
+    
+    'Contains': wrappers(
+        lambda x: wrappers(
+            lambda y: y in x,
+            'Contains[Iterable]<Any -> Boolean>',
+        ),
+        'Contains<Iterable -> Any -> Boolean>',
     ),
 
     # Real ->
