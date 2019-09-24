@@ -528,11 +528,11 @@ def compose(*functions):
         return ret
     return inner
 
-def check_type(sig, val):
+def check_type(sig, val, check_index=0):
     if sig == 'Signature -> *Vars -> Block -> *Args -> Any':
         return True
     
-    check = types[sig_parse(sig)[0]]
+    check = types[sig_parse(sig)[check_index]]
     if callable(check):
         ret = check(val)
     else:
@@ -668,7 +668,7 @@ class function:
             ret = evaluate(self.code, *args)[-1]
             ret_type = self.sig
             
-            try: check_type(ret_type, ret)
+            try: check_type(ret_type, ret, check_index=-1)
             except Msg as m:
                 raise Error(m.err, args[0], args[1], m.message)
             
