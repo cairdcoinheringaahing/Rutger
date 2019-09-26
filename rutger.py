@@ -623,6 +623,10 @@ def ifelse(condition):
         return wrappers(exe, 'IfElse[Block][Block]<Block -> Do>')
     return wrappers(if_arg, 'IfElse[Block]<Block -> Block -> Do>')
 
+def set_index(array, index, value):
+    array[index] = value
+    return array
+
 class function:
     def __init__(self, sig):
         args = sig_parse(sig)
@@ -814,6 +818,17 @@ builtins = {
             'GetIndex[Iterable]<Int -> Any>',
         ),
         'GetIndex<Iterable -> Int -> Any>',
+    ),
+    
+    'SetIndex': wrappers(
+        lambda x: wrapeprs(
+            lambda y: wrappers(
+                lambda z: set_index(x, y, z),
+                'SetIndex[Iterable][Int]<Any -> Iterable>',
+            ),
+            'SetIndex[Iterable]<Int -> Any -> Iterable>',
+        ),
+        'SetIndex<Iterable -> Int -> Any -> Iterable>',
     ),
     
     'Repeat': wrappers(
