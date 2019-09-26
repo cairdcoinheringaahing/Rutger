@@ -969,6 +969,11 @@ builtins = {
         'IsPrime<Int -> Boolean>',
     ),
     
+    'Char': wrappers(
+        lambda x: chr(x),
+        'Char<Int -> Str>',
+    ),
+    
     'BitwiseAnd': wrappers(
         lambda x: wrappers(
             lambda y: x & y,
@@ -1087,6 +1092,16 @@ builtins = {
     'Lowercase': wrappers(
         lambda string: string.lower(),
         'Lowercase<Str -> Str>',
+    ),
+    
+    'Ord': wrappers(
+        lambda string: ord(string),
+        'Ord<Str -> Int>',
+    ),
+    
+    'Ordinals': wrappers(
+        lambda string: list(map(ord, string)),
+        'Ordinals<Str -> Array>',
     ),
 
     # -> Var -> Block -> Do
